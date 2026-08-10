@@ -17,6 +17,8 @@ Put TLS and the public hostname in Coolify, Dokploy, or a reverse proxy. The API
 
 Run the onboarding studio on a separate protected host/port with `ENABLE_ONBOARDING_STUDIO=true` and `ONBOARDING_STANDALONE=true`. Install Pi globally, clone this repository, store `RISSETS_API_KEY` outside Git, and run generation/refinement in a per-tenant work directory.
 
+Use `scripts/vm-generate.sh` for a deterministic generated repository and all quality gates. Use `scripts/vm-refine.sh` to load the protected environment and start Pi with the tenant brief. Both commands accept absolute tenant work paths and never copy the router key into generated code.
+
 ## Release gates
 
 - `npm run check`

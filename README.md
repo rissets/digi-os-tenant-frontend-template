@@ -51,6 +51,13 @@ npm run agent:refine -- --model opencode-go/gpt-5.6-luna
 
 Provider metadata is stored in `.pi/agent/models.json`; no API key is committed. Other allowed models can be selected with `--model`.
 
+On the prepared generator VM, the same workflow is available as:
+
+```bash
+/opt/digi-os/tenant-frontend-template/scripts/vm-generate.sh /data/onboarding/acme.json /opt/digi-os/tenants/acme
+/opt/digi-os/tenant-frontend-template/scripts/vm-refine.sh /opt/digi-os/tenants/acme --model opencode-go/gpt-5.6-luna
+```
+
 ## Standalone onboarding studio
 
 ```bash
