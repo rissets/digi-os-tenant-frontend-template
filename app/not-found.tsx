@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
+export default function NotFound() { return <section className="mx-auto grid min-h-[70vh] max-w-4xl content-center px-5 py-20"><p className="text-xs font-black uppercase tracking-[.18em] text-[var(--brand-primary)]">404 / Page not found</p><h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(3rem,8vw,7rem)] font-black leading-[.9] tracking-[-.06em]">This route does not have published content yet.</h1><p className="mt-6 max-w-xl text-[var(--muted)]">Use the primary navigation or return to the homepage to explore available content.</p><Link className="mt-8 inline-flex w-fit min-h-12 items-center gap-2 rounded-xl bg-[var(--brand-primary)] px-5 font-black text-white" href="/"><ArrowLeft size={16}/>Return home</Link></section>; }

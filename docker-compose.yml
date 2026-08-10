@@ -1,0 +1,17 @@
+services:
+  tenant_frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TENANT_API_URL: ${TENANT_API_URL:?Set the tenant public API URL}
+      TENANT_SITE_URL: ${TENANT_SITE_URL:-http://localhost:3000}
+      TENANT_REVALIDATE_SECONDS: ${TENANT_REVALIDATE_SECONDS:-30}
+      TENANT_API_TIMEOUT_MS: ${TENANT_API_TIMEOUT_MS:-8000}
+      ENABLE_ONBOARDING_STUDIO: ${ENABLE_ONBOARDING_STUDIO:-false}
+      ONBOARDING_STANDALONE: ${ONBOARDING_STANDALONE:-false}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    extra_hosts:
+      - "${TENANT_API_DOCKER_HOST:-host.docker.internal}:host-gateway"
+    restart: unless-stopped

@@ -1,0 +1,3 @@
+"use client";
+
+export default function ErrorPage({ reset }: { reset: () => void }) { return <section className="mx-auto grid min-h-[70vh] max-w-4xl content-center px-5 py-20"><p className="text-xs font-black uppercase tracking-[.18em] text-[var(--brand-primary)]">Temporary connection issue</p><h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(3rem,8vw,7rem)] font-black leading-[.9] tracking-[-.06em]">Content could not be loaded.</h1><p className="mt-6 max-w-xl text-[var(--muted)]">The tenant backend may be updating. Try loading the page again.</p><button className="mt-8 min-h-12 w-fit rounded-xl bg-[var(--brand-primary)] px-5 font-black text-white" onClick={reset}>Reload</button></section>; }
