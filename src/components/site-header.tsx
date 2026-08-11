@@ -34,15 +34,18 @@ export function SiteHeader({ settings, branding, menus, locale: localeProp }: { 
   const query = new URLSearchParams(searchParams.toString()); query.set("locale", nextLocale);
   const localeUrl = `${pathname}?${query.toString()}`;
   const navigation = tenantProfile.experience.navigation;
+  const navPattern = String(tenantProfile.designSystem.navPattern || navigation);
   const headerClass = cn(
     "sticky top-0 z-[60] border-b border-black/10 backdrop-blur-2xl",
     navigation === "floating" ? "mx-auto mt-3 max-w-[calc(var(--content-width)+2rem)] rounded-2xl border bg-[var(--surface)]/88 shadow-xl" : "bg-[var(--surface)]/88",
     navigation === "editorial" && "border-b-4 border-[var(--ink)]",
+    navPattern === "side-dock" && "lg:ml-6 lg:mr-6 lg:rounded-r-3xl",
+    navPattern === "marquee-nav" && "border-b-0 bg-[var(--brand-secondary)] text-white",
   );
   const innerClass = cn("mx-auto flex min-h-[78px] max-w-[var(--content-width)] items-center justify-between gap-5 px-5", navigation === "minimal" && "min-h-16", navigation === "editorial" && "max-w-none px-[max(1.25rem,5vw)]");
   return <header className={headerClass}><div className={innerClass}>
     <BrandMark settings={settings} branding={branding}/>
-    <nav className={cn("hidden items-center gap-5 lg:flex", navigation === "minimal" && "gap-8", navigation === "editorial" && "order-first")} aria-label={copy.primaryNavigation}>{items.slice(0, 7).map((item) => <MenuGroup key={item.id} item={item} descendants={children(item)}/>)}</nav>
+    <nav className={cn("hidden items-center gap-5 lg:flex", navigation === "minimal" && "gap-8", navigation === "editorial" && "order-first", navPattern === "marquee-nav" && "gap-7 text-white")} aria-label={copy.primaryNavigation}>{items.slice(0, 7).map((item) => <MenuGroup key={item.id} item={item} descendants={children(item)}/>)}</nav>
     <div className="flex items-center gap-2"><Link className="grid size-10 place-items-center rounded-xl border border-black/10" href="/search" aria-label={copy.search}><Search size={18}/></Link>{settings.available_locales.length > 1 && <Link className="inline-flex min-h-10 items-center gap-1 rounded-xl border border-black/10 px-3 text-xs font-black" href={localeUrl} aria-label={`${copy.switchLanguage} ${nextLocale}`}><Languages size={16}/>{locale.toUpperCase()}</Link>}<Magnetic className="hidden sm:inline-flex"><Link className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--brand-primary)] px-4 text-xs font-black text-white" href={settings.contact_cta?.url || "/contact"}>{settings.contact_cta?.label || copy.contact}<ArrowUpRight size={15}/></Link></Magnetic><button className="grid size-10 place-items-center rounded-xl border border-black/10 lg:hidden" type="button" aria-expanded={open} aria-label={open ? copy.closeMenu : copy.openMenu} onClick={() => setOpen(!open)}>{open ? <X/> : <MenuIcon/>}</button></div>
   </div>{open && <nav className="grid max-h-[calc(100vh-78px)] overflow-auto border-t border-black/10 bg-[var(--surface)] px-5 pb-8 pt-4 lg:hidden" aria-label={copy.mobileNavigation}>{items.flatMap((item) => [item, ...children(item)]).map((item, index) => <Link className={cn("flex items-baseline gap-4 border-b border-black/10 py-3 font-[family-name:var(--font-display)] text-[clamp(1.35rem,7vw,2.3rem)] font-black", item.parent_id && "pl-10 text-lg")} key={item.id} href={item.url} onClick={() => setOpen(false)}><span className="font-mono text-[.62rem] text-[var(--brand-primary)]">{String(index + 1).padStart(2, "0")}</span>{item.label}</Link>)}</nav>}</header>;
 }

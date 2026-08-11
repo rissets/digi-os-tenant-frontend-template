@@ -63,10 +63,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const brand = site.branding;
   const locale = requestedLocale || site.locale || site.settings.default_locale;
   const copy = uiCopy(locale);
+  const paletteTints: Record<string, string> = { "cobalt-cream": "#3157d5", "forest-coral": "#0f766e", "plum-sand": "#7c3aed", "ink-lime": "#475569", "terracotta-sky": "#c2410c", "violet-mint": "#7c3aed", "navy-apricot": "#1d4ed8", "charcoal-lilac": "#6d28d9" };
+  const designTint = paletteTints[String(tenantProfile.designSystem.paletteFamily)] || brand.primary_color;
   const variables = {
     "--brand-primary": brand.primary_color,
     "--brand-secondary": brand.secondary_color,
     "--brand-accent": brand.accent_color,
+    "--design-tint": designTint,
     "--surface": brand.surface_color,
     "--ink": brand.text_color,
     "--muted": brand.muted_color,
@@ -78,7 +81,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     "--font-body": tenantProfile.bodyFont,
   } as CSSProperties;
   const schema = { "@context": "https://schema.org", "@type": "Organization", name: site.settings.legal_name || site.settings.site_name, url: process.env.TENANT_SITE_URL, email: site.settings.contact_email, telephone: site.settings.contact_phone, address: site.settings.address };
-  return <html lang={locale} data-archetype={tenantProfile.archetype} data-corners={tenantProfile.cornerStyle} data-cards={tenantProfile.cardTreatment} data-hero={tenantProfile.experience.hero} data-navigation={tenantProfile.experience.navigation} data-sections={tenantProfile.experience.sectionRhythm} data-gallery={tenantProfile.experience.gallery} data-footer={tenantProfile.experience.footer} data-motion={tenantProfile.motionLevel} data-motif={tenantProfile.motif}><body className="m-0 overflow-x-hidden bg-[var(--surface)] font-[family-name:var(--font-body)] text-[var(--ink)] antialiased" style={variables}>
+  return <html lang={locale} data-archetype={tenantProfile.archetype} data-palette={String(tenantProfile.designSystem.paletteFamily)} data-corners={tenantProfile.cornerStyle} data-cards={tenantProfile.cardTreatment} data-hero={tenantProfile.experience.hero} data-navigation={tenantProfile.experience.navigation} data-sections={tenantProfile.experience.sectionRhythm} data-gallery={tenantProfile.experience.gallery} data-footer={tenantProfile.experience.footer} data-motion={tenantProfile.motionLevel} data-motif={tenantProfile.motif}><body className="m-0 overflow-x-hidden bg-[var(--surface)] font-[family-name:var(--font-body)] text-[var(--ink)] antialiased" style={variables}>
     <MotionPrimitiveProvider><WatermelonProvider>
     <a className="fixed left-2 top-2 z-[200] -translate-y-[150%] bg-slate-950 px-4 py-2 text-white focus:translate-y-0" href="#main-content">{copy.skip}</a>
     <SiteHeader settings={site.settings} branding={site.branding} menus={site.menus} locale={locale}/><main id="main-content">{children}</main><SiteFooter settings={site.settings} branding={site.branding} footer={site.footer} locations={site.locations} locale={locale}/><ChannelWidget channel={channel} locale={locale}/><AnalyticsTracker/>

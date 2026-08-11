@@ -15,6 +15,8 @@ export type TenantProfile = {
   motionLevel: "calm" | "expressive" | "minimal";
   visualSeed: number;
   motif: "waves" | "blobs" | "grid" | "rays";
+  designSystem: Record<string, string | number>;
+  research: { category: string; visualReferences: string[]; compositionRules: string[]; motionRules: string[] };
   experience: {
     navigation: "minimal" | "mega" | "editorial" | "floating";
     hero: "split" | "manifesto" | "magazine" | "immersive";
@@ -49,6 +51,8 @@ export const tenantProfile: TenantProfile = {
   motionLevel: "calm",
   visualSeed: 17,
   motif: "grid",
+  designSystem: { seed: 17, paletteFamily: "cobalt-cream", displayFont: "Arial Narrow", bodyFont: "Inter", typeScale: "display-led", density: "balanced", radius: "mixed", texture: "grid", heroPattern: "split-proof", navPattern: "mega-directory", uspPattern: "metric-ribbon", testimonialPattern: "quote-cards", ctaPattern: "contrast-panel", footerPattern: "mega-directory", svgMotif: "orbit", motionRecipe: "precision-loop" },
+  research: { category: "professional-services", visualReferences: [], compositionRules: [], motionRules: [] },
   experience: {
     navigation: "mega",
     hero: "split",
