@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { CmsRenderer } from "@/src/components/cms-renderer";
-import { CollectionDetail, CollectionView } from "@/src/components/collection-view";
 import { LocationSection } from "@/src/components/location-section";
 import { MediaLibrary } from "@/src/components/media-library";
 import { SearchView } from "@/src/components/search-view";
 import { getCollection, getCollectionItem, getMedia, getPage, getPageResources, getSiteBundle, isCollectionKey, resolvePublicRedirect, searchPublicContent } from "@/src/lib/api";
 import { uiCopy } from "@/src/lib/i18n";
+import { TenantCmsRenderer, TenantCollectionDetail, TenantCollectionView, TenantPage } from "@/src/tenant/presentation";
 
 type Query = Record<string, string | string[] | undefined>;
 type RouteProps = { params: Promise<{ segments?: string[] }>; searchParams: Promise<Query> };
@@ -45,18 +44,18 @@ export default async function TenantRoute({ params, searchParams }: RouteProps) 
   if (!segments.length) {
     if (!bundle.homepage) notFound();
     const resources = await getPageResources(bundle.homepage, locale);
-    return <CmsRenderer page={bundle.homepage} settings={{ ...bundle.site.settings, default_locale: locale || bundle.site.locale || bundle.site.settings.default_locale }} resources={resources}/>;
+    return <TenantCmsRenderer page={bundle.homepage} settings={{ ...bundle.site.settings, default_locale: locale || bundle.site.locale || bundle.site.settings.default_locale }} resources={resources}/>;
   }
   const [root, slug] = segments;
   if (root === "search") {
     const q = value(query, "q")?.trim() || "";
     const data = q.length >= 2 ? await searchPublicContent(q, locale).catch(() => null) : null;
-    return <SearchView data={data} query={q} locale={locale || bundle.site.locale}/>;
+    return <TenantPage kind="search"><SearchView data={data} query={q} locale={locale || bundle.site.locale}/></TenantPage>;
   }
-  if (root === "media") return <MediaLibrary media={await getMedia()} locale={locale || bundle.site.locale}/>;
+  if (root === "media") return <TenantPage kind="media"><MediaLibrary media={await getMedia()} locale={locale || bundle.site.locale}/></TenantPage>;
   if (isCollectionKey(root)) {
-    if (slug) { const item = await getCollectionItem(root, slug, locale); if (!item) notFound(); return <CollectionDetail collectionKey={root} item={item} locale={locale || bundle.site.locale}/>; }
-    const collection = await getCollection(root, "", locale); return <CollectionView collectionKey={root} items={collection.results} locale={locale || bundle.site.locale}/>;
+    if (slug) { const item = await getCollectionItem(root, slug, locale); if (!item) notFound(); return <TenantCollectionDetail collectionKey={root} item={item} locale={locale || bundle.site.locale}/>; }
+    const collection = await getCollection(root, "", locale); return <TenantCollectionView collectionKey={root} items={collection.results} locale={locale || bundle.site.locale}/>;
   }
   const page = await getPage(root, locale);
   if (!page) {
@@ -66,5 +65,5 @@ export default async function TenantRoute({ params, searchParams }: RouteProps) 
   }
   const resources = await getPageResources(page, locale);
   const showLocations = page.page_type === "contact" || root === "contact";
-  return <><CmsRenderer page={page} settings={{ ...bundle.site.settings, default_locale: locale || bundle.site.locale || bundle.site.settings.default_locale }} resources={resources}/>{showLocations && <LocationSection locations={bundle.site.locations || []} locale={locale || bundle.site.locale}/>}</>;
+  return <><TenantCmsRenderer page={page} settings={{ ...bundle.site.settings, default_locale: locale || bundle.site.locale || bundle.site.settings.default_locale }} resources={resources}/>{showLocations && <TenantPage kind="locations"><LocationSection locations={bundle.site.locations || []} locale={locale || bundle.site.locale}/></TenantPage>}</>;
 }
