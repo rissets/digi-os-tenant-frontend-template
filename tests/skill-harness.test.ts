@@ -45,6 +45,7 @@ describe("Pi skill harness", () => {
     expect(args.join(" ")).toContain("GENERATION_GAP_BRIEF.md");
     expect(args.join(" ")).toContain("before spending time on audit prose");
     expect(args.join(" ")).toContain("display clamp at or below 8rem");
+    expect(args.join(" ")).toContain("button and control labels");
     expect(attestation.order).toEqual(names);
     expect(attestation.skills.every((skill: { sha256: string }) => skill.sha256.length === 64)).toBe(true);
   });
