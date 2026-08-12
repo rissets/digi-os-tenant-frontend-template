@@ -169,7 +169,7 @@ await writeFile(path.join(output, "TENANT_AGENT_BRIEF.md"), [
   "2. Taste is explicitly loaded. Write TASTE_AUDIT.md with its brief inference, anti-slop bans, hierarchy, density, and theme/shape/color locks before editing presentation source.",
   "3. Superpowers planning skills are explicitly loaded. Write IMPLEMENTATION_PLAN.md with file-level structural changes before coding.",
   "4. Three.js animation is explicitly loaded for a use/skip decision. Write MOTION_DECISION.json; use Three.js only when spatial/technical meaning justifies its cost, otherwise author at least three purposeful SVG motion systems.",
-  "5. Materially rewrite src/tenant/** and supporting Tailwind React components: DOM topology, responsive order, typography, image treatment, navigation, hero, proof, testimonial, CTA, gallery, collection/detail, footer, and motion. Palette-only or JSON-only changes fail.",
+  "5. Treat src/generated/** as an immutable onboarding/API contract. Materially rewrite src/tenant/** and supporting Tailwind React components: DOM topology, responsive order, typography, image treatment, navigation, hero, proof, testimonial, CTA, gallery, collection/detail, footer, and motion. Palette-only or JSON-only changes fail.",
   "",
   "## Design system",
   "",
