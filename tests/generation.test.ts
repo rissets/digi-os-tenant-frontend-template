@@ -42,6 +42,7 @@ describe("Frontend Generation V3", () => {
     expect(industrialSource).toContain("TECHNICAL CAPABILITY / SYSTEM PERFORMANCE");
     expect(healthcareSource).toContain('const category = "healthcare"');
     expect(healthcareSource).toContain("CARE PATH / HUMAN OUTCOMES");
+    expect(readFileSync(path.join(industrial, "DESIGN_APPROVAL.md"), "utf8")).toContain("Do not pause");
     expect(industrialSource).not.toBe(healthcareSource);
     const industrialSignature = JSON.parse(readFileSync(path.join(industrial, "src/generated/design-signature.json"), "utf8"));
     const healthcareSignature = JSON.parse(readFileSync(path.join(healthcare, "src/generated/design-signature.json"), "utf8"));

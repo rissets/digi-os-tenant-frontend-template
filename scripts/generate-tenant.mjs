@@ -147,6 +147,7 @@ await mkdir(path.join(output, "src/tenant"), { recursive: true });
 await writeFile(path.join(output, "src/tenant/presentation.tsx"), tenantPresentation);
 await writeFile(path.join(output, "research-dossier.json"), `${JSON.stringify(research, null, 2)}\n`);
 await writeFile(path.join(output, "design-direction.json"), `${JSON.stringify({ version: "3.0", category, designSystem, requiredStructuralAxes: 4, requiredChangedAxes: 6 }, null, 2)}\n`);
+await writeFile(path.join(output, "DESIGN_APPROVAL.md"), "# Approved autonomous design generation\n\nThe tenant owner approved this generation when onboarding was submitted. Select the strongest category-appropriate direction using UI UX Pro Max and Taste, record the decision, and continue through planning, implementation, verification, and delivery in this same non-interactive run. Do not pause for another design approval or ask a question.\n");
 
 const packageJson = JSON.parse(await readFile(path.join(output, "package.json"), "utf8")); packageJson.name = manifest.deployment.repositoryName;
 await writeFile(path.join(output, "package.json"), `${JSON.stringify(packageJson, null, 2)}\n`);
@@ -160,6 +161,7 @@ await writeFile(path.join(output, "TENANT_AGENT_BRIEF.md"), [
   "## Mission",
   "",
   `Build a recognisably unique public website for **${manifest.tenant.name}**. This is a code-generation task, not a JSON configuration task.`,
+  "The tenant owner already approved autonomous design generation at onboarding submission. Do not pause or ask for another design approval; select the strongest direction and implement it in this run.",
   "",
   "## Mandatory design workflow",
   "",
