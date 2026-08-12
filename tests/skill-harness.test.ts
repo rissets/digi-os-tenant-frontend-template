@@ -42,6 +42,8 @@ describe("Pi skill harness", () => {
     const attestation = JSON.parse(readFileSync(path.join(work, "skill-attestation.json"), "utf8"));
     expect(args).toContain("--no-skills");
     expect(args.filter((arg) => arg === "--skill")).toHaveLength(names.length);
+    expect(args.join(" ")).toContain("GENERATION_GAP_BRIEF.md");
+    expect(args.join(" ")).toContain("before spending time on audit prose");
     expect(attestation.order).toEqual(names);
     expect(attestation.skills.every((skill: { sha256: string }) => skill.sha256.length === 64)).toBe(true);
   });
