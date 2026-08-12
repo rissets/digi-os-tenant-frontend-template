@@ -47,5 +47,8 @@ describe("Frontend Generation V3", () => {
     const industrialSignature = JSON.parse(readFileSync(path.join(industrial, "src/generated/design-signature.json"), "utf8"));
     const healthcareSignature = JSON.parse(readFileSync(path.join(healthcare, "src/generated/design-signature.json"), "utf8"));
     expect(industrialSignature.signatureHash).not.toBe(healthcareSignature.signatureHash);
+    const industrialProfile = readFileSync(path.join(industrial, "src/generated/tenant-profile.ts"), "utf8");
+    expect(industrialProfile).toContain('"motif": "grid"');
+    expect(industrialProfile).not.toContain('"query":');
   });
 });

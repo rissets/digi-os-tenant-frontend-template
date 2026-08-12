@@ -21,13 +21,31 @@ await cp(templateRoot, output, { recursive: true, filter: (source) => !["node_mo
 const seedInput = `${manifest.tenant.key}:${manifest.business.industry}:${manifest.brand.designSystem?.seed || ""}:${manifest.brand.referenceNotes || ""}`;
 const hash = Number.parseInt(createHash("sha256").update(seedInput).digest("hex").slice(0, 8), 16);
 const motifs = manifest.brand.preferredMotifs || ["grid"];
+const supportedMotifs = new Set(["waves", "blobs", "grid", "rays"]);
+const motifAliases = new Map([
+  ["gentle contours", "waves"],
+  ["botanical lines", "waves"],
+  ["editorial portrait crops", "blobs"],
+  ["blueprint traces", "grid"],
+  ["machine geometry", "grid"],
+  ["safety markings", "rays"],
+]);
+const selectedMotif = motifs
+  .map((motif) => motifAliases.get(String(motif).toLowerCase()) || String(motif).toLowerCase())
+  .find((motif) => supportedMotifs.has(motif)) || "grid";
 const archetypes = ["precision-grid", "kinetic-orbit", "warm-editorial", "bold-collage"];
 const selectedArchetype = manifest.brand.archetype || archetypes[hash % archetypes.length];
 const selectedCorners = manifest.brand.cornerStyle || (hash % 2 ? "mixed" : "soft");
 const selectedCards = manifest.brand.cardTreatment || (hash % 3 === 0 ? "glass" : "outline");
 const generatedDesignSystem = { seed: hash, paletteFamily: ["cobalt-cream", "forest-coral", "plum-sand", "ink-lime", "terracotta-sky", "violet-mint", "navy-apricot", "charcoal-lilac"][hash % 8], displayFont: manifest.brand.displayFont || ["Space Grotesk", "DM Serif Display", "Manrope", "Fraunces", "Syne", "Plus Jakarta Sans", "Bodoni Moda", "Outfit"][hash % 8], bodyFont: manifest.brand.bodyFont || ["IBM Plex Sans", "Source Sans 3", "DM Sans", "Work Sans", "Nunito Sans", "Inter", "Public Sans", "Figtree"][hash % 8], typeScale: ["display-led", "editorial-contrast", "compact-utility", "airy-humanist"][hash % 4], density: ["airy", "balanced", "dense"][hash % 3], radius: ["none", "soft", "pill", "mixed"][hash % 4], texture: ["paper", "grain", "blueprint", "flat"][hash % 4], heroPattern: ["split-proof", "manifesto-type", "magazine-crop", "immersive-caption", "stacked-cards", "editorial-index"][hash % 6], navPattern: ["minimal-rail", "mega-directory", "editorial-rule", "floating-island", "side-dock", "marquee-nav"][hash % 6], uspPattern: ["metric-ribbon", "bento-proof", "service-timeline", "icon-led-grid", "horizontal-story", "case-study-strip"][hash % 6], testimonialPattern: ["quote-cards", "single-quote", "logo-proof", "stacked-notes", "avatar-rail", "editorial-pullquote"][hash % 6], ctaPattern: ["contrast-panel", "split-invitation", "magnetic-pill", "full-bleed-band", "contact-led-card", "next-chapter"][hash % 6], footerPattern: ["mega-directory", "contact-led", "editorial-index", "compact-proof", "map-first", "newsletter-studio"][hash % 6], svgMotif: ["orbit", "contour", "spark", "wave", "grid", "ribbon"][hash % 6], motionRecipe: ["slow-drift", "kinetic-reveal", "editorial-scrub", "parallax-calm", "springy", "precision-loop"][hash % 6] };
 const designSystem = manifest.brand.designSystem ? { ...generatedDesignSystem, ...manifest.brand.designSystem } : generatedDesignSystem;
-const research = manifest.research || { category: manifest.business.industry || "professional-services", visualReferences: [], compositionRules: [], motionRules: [] };
+const researchInput = manifest.research || {};
+const research = {
+  category: researchInput.category || manifest.business.industry || "professional-services",
+  visualReferences: Array.isArray(researchInput.visualReferences) ? researchInput.visualReferences : [],
+  compositionRules: Array.isArray(researchInput.compositionRules) ? researchInput.compositionRules : [],
+  motionRules: Array.isArray(researchInput.motionRules) ? researchInput.motionRules : [],
+};
 const profileData = {
   tenantKey: manifest.tenant.key,
   designVersion: "2.1.0",
@@ -42,7 +60,7 @@ const profileData = {
   cardTreatment: selectedCards,
   motionLevel: manifest.brand.motionLevel,
   visualSeed: hash,
-  motif: motifs[hash % motifs.length],
+  motif: selectedMotif,
   designSystem,
   research,
   experience: {
