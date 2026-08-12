@@ -40,15 +40,31 @@ describe("Frontend Generation V3", () => {
     const healthcareSource = readFileSync(path.join(healthcare, "src/tenant/presentation.tsx"), "utf8");
     expect(industrialSource).toContain('const category = "industrial"');
     expect(industrialSource).toContain("TECHNICAL CAPABILITY / SYSTEM PERFORMANCE");
+    expect(industrialSource).toContain('from "@/src/tenant/cms-renderer"');
+    expect(industrialSource).toContain('from "@/src/tenant/site-header"');
+    expect(industrialSource).toContain('from "@/src/tenant/site-footer"');
     expect(healthcareSource).toContain('const category = "healthcare"');
     expect(healthcareSource).toContain("CARE PATH / HUMAN OUTCOMES");
     expect(readFileSync(path.join(industrial, "DESIGN_APPROVAL.md"), "utf8")).toContain("Do not pause");
     expect(industrialSource).not.toBe(healthcareSource);
+    for (const generated of [industrial, healthcare]) {
+      for (const file of ["cms-renderer.tsx", "site-header.tsx", "site-footer.tsx"]) {
+        expect(readFileSync(path.join(generated, "src/tenant", file), "utf8").length).toBeGreaterThan(1000);
+      }
+    }
+    const industrialFonts = readFileSync(path.join(industrial, "src/generated/fonts.ts"), "utf8");
+    const healthcareFonts = readFileSync(path.join(healthcare, "src/generated/fonts.ts"), "utf8");
+    expect(industrialFonts).toContain("Sora");
+    expect(industrialFonts).toContain("IBM_Plex_Sans");
+    expect(healthcareFonts).toContain("Newsreader");
+    expect(healthcareFonts).toContain("Source_Sans_3");
+    expect(industrialFonts).not.toBe(healthcareFonts);
     const industrialSignature = JSON.parse(readFileSync(path.join(industrial, "src/generated/design-signature.json"), "utf8"));
     const healthcareSignature = JSON.parse(readFileSync(path.join(healthcare, "src/generated/design-signature.json"), "utf8"));
     expect(industrialSignature.signatureHash).not.toBe(healthcareSignature.signatureHash);
     const industrialProfile = readFileSync(path.join(industrial, "src/generated/tenant-profile.ts"), "utf8");
     expect(industrialProfile).toContain('"motif": "grid"');
     expect(industrialProfile).not.toContain('"query":');
+    expect(readFileSync(path.join(industrial, "TENANT_AGENT_BRIEF.md"), "utf8")).toContain("page silhouette");
   });
 });

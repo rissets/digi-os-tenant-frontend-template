@@ -14,7 +14,7 @@ import { WmAccordion, WmBadge, WmBentoGrid, WmCard } from "./watermelon-provider
 const sectionFrame = "mx-auto w-full max-w-[var(--content-width)] px-5 py-[clamp(4.5rem,9vw,8.5rem)]";
 const display = "font-[family-name:var(--font-display)] font-black tracking-[-.055em] leading-[.95] text-balance";
 const eyebrow = "mb-4 flex items-center gap-2 text-[.68rem] font-black uppercase tracking-[.18em] text-[var(--brand-primary)]";
-const primaryButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--brand-primary)] bg-[var(--brand-primary)] px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-[var(--brand-secondary)]";
+const primaryButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--brand-primary)] bg-[var(--brand-primary)] px-5 py-3 text-sm font-black text-[var(--on-primary)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-secondary)] hover:text-[var(--on-secondary)]";
 const textLink = "inline-flex items-center gap-2 border-b border-current py-1 text-xs font-black uppercase tracking-wider text-[var(--brand-primary)]";
 
 function SectionHead({ block }: { block: BlockContent }) {

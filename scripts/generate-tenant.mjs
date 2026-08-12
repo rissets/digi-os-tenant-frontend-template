@@ -77,7 +77,38 @@ const profileData = {
 };
 const profile = `import type { MotionPrimitiveName, WatermelonComponentName } from "@/src/lib/component-catalog";\n\nexport type TenantProfile = {\n  tenantKey: string; designVersion: string; archetype: "precision-grid" | "kinetic-orbit" | "warm-editorial" | "bold-collage"; personality: string[]; audience: string[]; primaryGoal: string; displayFont: string; bodyFont: string; cornerStyle: "soft" | "sharp" | "mixed"; heroComposition: "split" | "centered" | "editorial"; cardTreatment: "glass" | "solid" | "outline"; motionLevel: "calm" | "expressive" | "minimal"; visualSeed: number; motif: "waves" | "blobs" | "grid" | "rays"; designSystem: Record<string, string | number>; research: { category: string; visualReferences: string[]; compositionRules: string[]; motionRules: string[] }; experience: { navigation: "minimal" | "mega" | "editorial" | "floating"; hero: "split" | "manifesto" | "magazine" | "immersive"; sectionRhythm: "even" | "alternating" | "editorial" | "collage"; gallery: "masonry" | "filmstrip" | "editorial" | "grid"; footer: "compact" | "mega" | "editorial" | "contact-led"; chatLauncher: "pill" | "orb" | "minimal"; motionPrimitives: MotionPrimitiveName[]; watermelonComponents: WatermelonComponentName[]; patterns?: Record<string, string> }; customLabels: { work: string; insights: string; contact: string };\n};\n\n// Generated from onboarding. AI agents may refine presentation, never source business content.\nexport const tenantProfile: TenantProfile = ${JSON.stringify(profileData, null, 2)};\n`;
 await writeFile(path.join(output, "src/generated/tenant-profile.ts"), profile);
-const signatureIdentity = { category: research.category, paletteFamily: profileData.designSystem.paletteFamily, displayFont: profileData.designSystem.displayFont || profileData.displayFont, bodyFont: profileData.designSystem.bodyFont || profileData.bodyFont, typeScale: profileData.designSystem.typeScale, density: profileData.designSystem.density, radius: profileData.designSystem.radius, hero: profileData.designSystem.heroPattern, navigation: profileData.designSystem.navPattern, usp: profileData.designSystem.uspPattern, testimonials: profileData.designSystem.testimonialPattern, cta: profileData.designSystem.ctaPattern, footer: profileData.designSystem.footerPattern, gallery: profileData.designSystem.galleryPattern || profileData.experience.gallery, svgMotif: profileData.designSystem.svgMotif, motion: profileData.designSystem.motionRecipe };
+const fontCatalog = {
+  "Archivo": { exportName: "Archivo", variable: true },
+  "Bodoni Moda": { exportName: "Bodoni_Moda", variable: true },
+  "DM Sans": { exportName: "DM_Sans", variable: true },
+  "DM Serif Display": { exportName: "DM_Serif_Display", variable: false, weight: "400" },
+  "Figtree": { exportName: "Figtree", variable: true },
+  "Fraunces": { exportName: "Fraunces", variable: true },
+  "IBM Plex Sans": { exportName: "IBM_Plex_Sans", variable: false, weight: ["400", "500", "600", "700"] },
+  "Inter": { exportName: "Inter", variable: true },
+  "Manrope": { exportName: "Manrope", variable: true },
+  "Newsreader": { exportName: "Newsreader", variable: true },
+  "Nunito Sans": { exportName: "Nunito_Sans", variable: true },
+  "Outfit": { exportName: "Outfit", variable: true },
+  "Plus Jakarta Sans": { exportName: "Plus_Jakarta_Sans", variable: true },
+  "Public Sans": { exportName: "Public_Sans", variable: true },
+  "Sora": { exportName: "Sora", variable: true },
+  "Source Sans 3": { exportName: "Source_Sans_3", variable: true },
+  "Space Grotesk": { exportName: "Space_Grotesk", variable: true },
+  "Syne": { exportName: "Syne", variable: true },
+  "Work Sans": { exportName: "Work_Sans", variable: true },
+};
+function fontSource(name, alias, cssVariable) {
+  const selected = fontCatalog[name] || fontCatalog.Inter;
+  const options = [`subsets: ["latin"]`, `display: "swap"`, `variable: "${cssVariable}"`];
+  if (!selected.variable) options.push(`weight: ${JSON.stringify(selected.weight || "400")}`);
+  return { exportName: selected.exportName, code: `export const ${alias} = ${selected.exportName}({ ${options.join(", ")} });` };
+}
+const displayFontSource = fontSource(String(designSystem.displayFont || profileData.displayFont), "tenantDisplayFont", "--tenant-font-display");
+const bodyFontSource = fontSource(String(designSystem.bodyFont || profileData.bodyFont), "tenantBodyFont", "--tenant-font-body");
+const fontImports = [...new Set([displayFontSource.exportName, bodyFontSource.exportName])].join(", ");
+await writeFile(path.join(output, "src/generated/fonts.ts"), `import { ${fontImports} } from "next/font/google";\n\n${displayFontSource.code}\n\n${bodyFontSource.code}\n`);
+const signatureIdentity = { category: research.category, paletteFamily: profileData.designSystem.paletteFamily, displayFont: profileData.designSystem.displayFont || profileData.displayFont, bodyFont: profileData.designSystem.bodyFont || profileData.bodyFont, typeScale: profileData.designSystem.typeScale, density: profileData.designSystem.density, radius: profileData.designSystem.radius, hero: profileData.designSystem.heroPattern, navigation: profileData.designSystem.navPattern, usp: profileData.designSystem.uspPattern, testimonials: profileData.designSystem.testimonialPattern, cta: profileData.designSystem.ctaPattern, footer: profileData.designSystem.footerPattern, gallery: profileData.designSystem.galleryPattern || profileData.experience.gallery, svgMotif: profileData.designSystem.svgMotif, motion: profileData.designSystem.motionRecipe, shellFamily: profileData.designSystem.shellFamily, heroGeometry: profileData.designSystem.heroGeometry, headingTreatment: profileData.designSystem.headingTreatment, sectionOrder: profileData.designSystem.sectionOrder, imageTreatment: profileData.designSystem.imageTreatment, ctaPlacement: profileData.designSystem.ctaPlacement };
 const signaturePayload = { tenantKey: manifest.tenant.key, ...signatureIdentity };
 const signatureHash = createHash("sha256").update(JSON.stringify(signatureIdentity)).digest("hex");
 await writeFile(path.join(output, "src/generated/design-signature.json"), `${JSON.stringify({ ...signaturePayload, signatureHash }, null, 2)}\n`);
@@ -136,14 +167,14 @@ const categoryComposition = {
 };
 
 const tenantPresentation = `import type { ReactNode } from "react";
-import { CmsRenderer } from "@/src/components/cms-renderer";
+import { CmsRenderer } from "@/src/tenant/cms-renderer";
 import { CollectionDetail, CollectionView } from "@/src/components/collection-view";
-import { SiteFooter } from "@/src/components/site-footer";
-import { SiteHeader } from "@/src/components/site-header";
+import { SiteFooter } from "@/src/tenant/site-footer";
+import { SiteHeader } from "@/src/tenant/site-header";
 import type { BrandConfig, CmsPage, CollectionItem, FooterConfig, Menu, PageResources, SiteLocation, SiteSettings } from "@/src/lib/types";
 
 const category = ${JSON.stringify(category)};
-const artDirection = ${JSON.stringify({ hero: designSystem.heroPattern, navigation: designSystem.navPattern, proof: designSystem.uspPattern, gallery: designSystem.galleryPattern, footer: designSystem.footerPattern, motion: designSystem.motionRecipe })};
+const artDirection = ${JSON.stringify({ hero: String(designSystem.heroPattern || "split-proof"), navigation: String(designSystem.navPattern || "minimal-rail"), proof: String(designSystem.uspPattern || "case-study-strip"), gallery: String(designSystem.galleryPattern || manifest.experience.gallery || "grid"), footer: String(designSystem.footerPattern || manifest.experience.footer || "contact-led"), motion: String(designSystem.motionRecipe || "soft-reveal"), shell: String(designSystem.shellFamily || "editorial-casework-index"), heroGeometry: String(designSystem.heroGeometry || "type-led-asymmetric"), heading: String(designSystem.headingTreatment || "editorial-display-with-rule"), sectionOrder: String(designSystem.sectionOrder || "hero-point-of-view-work-expertise-stories-insights-contact"), imageTreatment: String(designSystem.imageTreatment || "art-directed-casework"), ctaPlacement: String(designSystem.ctaPlacement || "contact-led-final-chapter") })};
 
 export function TenantHeader(props: { settings: SiteSettings; branding?: BrandConfig; menus: Menu[]; locale?: string }) {
   return <div className=${JSON.stringify(categoryComposition.chrome)} data-tenant-chrome={artDirection.navigation} data-business-category={category}><SiteHeader {...props}/></div>;
@@ -154,7 +185,7 @@ export function TenantFooter(props: { settings: SiteSettings; branding?: BrandCo
 }
 
 export function TenantPage({ children, kind = "content" }: { children: ReactNode; kind?: string }) {
-  return <div className=${JSON.stringify(categoryComposition.page)} data-tenant-composition={kind} data-hero-pattern={artDirection.hero} data-proof-pattern={artDirection.proof} data-gallery-pattern={artDirection.gallery}><div className=${JSON.stringify(categoryComposition.layout)}><div>{children}</div>${categoryComposition.rail ? '<aside aria-hidden="true" className="hidden border-l border-[var(--brand-primary)]/15 px-3 py-24 font-mono text-[.55rem] font-black uppercase tracking-[.24em] text-[var(--brand-primary)] [writing-mode:vertical-rl] lg:block">' + categoryComposition.accent + '</aside>' : ''}</div></div>;
+  return <div className=${JSON.stringify(categoryComposition.page)} data-tenant-composition={kind} data-shell-family={artDirection.shell} data-hero-pattern={artDirection.hero} data-hero-geometry={artDirection.heroGeometry} data-heading-treatment={artDirection.heading} data-section-order={artDirection.sectionOrder} data-image-treatment={artDirection.imageTreatment} data-cta-placement={artDirection.ctaPlacement} data-proof-pattern={artDirection.proof} data-gallery-pattern={artDirection.gallery}><div className=${JSON.stringify(categoryComposition.layout)}><div>{children}</div>${categoryComposition.rail ? '<aside aria-hidden="true" className="hidden border-l border-[var(--brand-primary)]/15 px-3 py-24 font-mono text-[.55rem] font-black uppercase tracking-[.24em] text-[var(--brand-primary)] [writing-mode:vertical-rl] lg:block">' + categoryComposition.accent + '</aside>' : ''}</div></div>;
 }
 
 export function TenantCmsRenderer(props: { page: CmsPage; settings: SiteSettings; resources?: PageResources }) { return <TenantPage kind={props.page.page_type || "cms"}><CmsRenderer {...props}/></TenantPage>; }
@@ -163,6 +194,17 @@ export function TenantCollectionDetail(props: { collectionKey: string; item: Col
 `;
 await mkdir(path.join(output, "src/tenant"), { recursive: true });
 await writeFile(path.join(output, "src/tenant/presentation.tsx"), tenantPresentation);
+const promotedSources = [
+  ["cms-renderer.tsx", "cms-renderer.tsx"],
+  ["site-header.tsx", "site-header.tsx"],
+  ["site-footer.tsx", "site-footer.tsx"],
+];
+for (const [sourceName, destinationName] of promotedSources) {
+  let source = await readFile(path.join(output, "src/components", sourceName), "utf8");
+  source = source.replaceAll(/from "\.\/([^\"]+)"/g, 'from "@/src/components/$1"');
+  if (sourceName === "site-footer.tsx") source = source.replace('from "@/src/components/site-header"', 'from "@/src/tenant/site-header"');
+  await writeFile(path.join(output, "src/tenant", destinationName), source);
+}
 await writeFile(path.join(output, "research-dossier.json"), `${JSON.stringify(research, null, 2)}\n`);
 await writeFile(path.join(output, "design-direction.json"), `${JSON.stringify({ version: "3.0", category, designSystem, requiredStructuralAxes: 4, requiredChangedAxes: 6 }, null, 2)}\n`);
 await writeFile(path.join(output, "DESIGN_APPROVAL.md"), "# Approved autonomous design generation\n\nThe tenant owner approved this generation when onboarding was submitted. Select the strongest category-appropriate direction using UI UX Pro Max and Taste, record the decision, and continue through planning, implementation, verification, and delivery in this same non-interactive run. Do not pause for another design approval or ask a question.\n");
@@ -187,7 +229,8 @@ await writeFile(path.join(output, "TENANT_AGENT_BRIEF.md"), [
   "2. Taste is explicitly loaded. Write TASTE_AUDIT.md with its brief inference, anti-slop bans, hierarchy, density, and theme/shape/color locks before editing presentation source.",
   "3. Superpowers planning skills are explicitly loaded. Write IMPLEMENTATION_PLAN.md with file-level structural changes before coding.",
   "4. Three.js animation is explicitly loaded for a use/skip decision. Write MOTION_DECISION.json; use Three.js only when spatial/technical meaning justifies its cost, otherwise author at least three purposeful SVG motion systems.",
-  "5. Treat src/generated/** as an immutable onboarding/API contract. Materially rewrite src/tenant/** and supporting Tailwind React components: DOM topology, responsive order, typography, image treatment, navigation, hero, proof, testimonial, CTA, gallery, collection/detail, footer, and motion. Palette-only or JSON-only changes fail.",
+  "5. Treat src/generated/** as an immutable onboarding/API contract. The generator promoted the complete CMS renderer, header, footer, and composition into src/tenant/**. Materially rewrite presentation.tsx, cms-renderer.tsx, site-header.tsx, and site-footer.tsx; importing their shared generic counterparts fails.",
+  "6. Preserve the public data contracts while replacing the visual anatomy: DOM topology, responsive order, typography, image treatment, navigation, hero, proof, testimonial, CTA, gallery, collection/detail, footer, and motion. Palette-only, wrapper-only, SVG-only, and JSON-only changes fail.",
   "",
   "## Design system",
   "",
@@ -198,10 +241,13 @@ await writeFile(path.join(output, "TENANT_AGENT_BRIEF.md"), [
   `- SVG motif / motion: ${designSystem.svgMotif} / ${designSystem.motionRecipe}`,
   `- Industry dossier: ${research.category}`,
   `- Cited visual references: ${(research.sources || []).map((source) => `${source.name}: ${source.url} (${source.insight})`).join("; ") || research.visualReferences.join("; ")}`,
+  `- UI pattern demos to study, never clone: ${(research.demoReferences || []).join("; ")}`,
+  `- Required layout contract: ${JSON.stringify(research.layoutContract || {})}`,
   `- Composition rules: ${research.compositionRules.join("; ")}`,
   `- Motion rules: ${research.motionRules.join("; ")}`,
   "",
-  "Do not reuse another tenant's hero, USP, testimonials, CTA, navbar, footer, font pairing, spacing rhythm, card treatment, or section order. Respect reduced motion and WCAG 2.2 AA.",
+  "Do not reuse another tenant's hero, USP, testimonials, CTA, navbar, footer, font pairing, heading scale, spacing rhythm, card treatment, image crop language, or section order. Respect reduced motion and WCAG 2.2 AA.",
+  "Do not retain the boilerplate's default two-column section heading, shared max-width cadence, identical rounded cards, or equal multi-column grids across the entire page. Build a recognisable page silhouette before decorating details.",
   "",
   "## Data and locale contract",
   "",
@@ -210,6 +256,6 @@ await writeFile(path.join(output, "TENANT_AGENT_BRIEF.md"), [
   "",
   "## Required report",
   "",
-  "Finish by writing AI_GENERATION_REPORT.md and generation-report.json with changed source files, selected patterns, skill artifacts, animation evidence, locale/API checks, and route/build checks. Do not claim a skill was used unless its required artifact exists.",
+  "Finish by writing AI_GENERATION_REPORT.md, generation-report.json, VISUAL_DIVERGENCE_REPORT.json, and CONTRAST_AUDIT.json with changed source files, selected patterns, computed color-pair ratios, animation evidence, locale/API checks, and route/build checks. Do not claim a skill was used unless its required artifact exists.",
 ].join("\n") + "\n");
 console.log(`Generated ${manifest.tenant.name} frontend at ${output}`);
